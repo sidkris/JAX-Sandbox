@@ -20,16 +20,16 @@ class TokenAndPositionEmbedding(nnx.Module):
 def causal_attention_mask(seq_len):
     return jnp.tril(jnp.ones((seq_len, seq_len)))
 
-
-mask = causal_attention_mask(8)
-plt.figure(figsize=(6, 5))
-plt.imshow(mask, cmap = "Blues", interpolation = "nearest")
-plt.xlabel("Key Position")
-plt.ylabel("Query Position")
-plt.title("Causal Attention Mask (White = Attend, Blue = Masked)")
-plt.colorbar(label = "Attention Allowed")
-plt.tight_layout()
-plt.show()
+def plot_():
+    mask = causal_attention_mask(8)
+    plt.figure(figsize=(6, 5))
+    plt.imshow(mask, cmap = "Blues", interpolation = "nearest")
+    plt.xlabel("Key Position")
+    plt.ylabel("Query Position")
+    plt.title("Causal Attention Mask (White = Attend, Blue = Masked)")
+    plt.colorbar(label = "Attention Allowed")
+    plt.tight_layout()
+    plt.show()
 
 
 # Transformer Block
@@ -74,3 +74,22 @@ class MiniLLM(nnx.Module):
         logits = self.output_layer(x)
         return logits
     
+
+
+if __name__ == "__main__":
+
+    import tiktoken 
+    
+    tokenizer = tiktoken.get_encoding("gpt2")
+    
+    model = MiniLLM(
+        max_len = 128,
+        vocab_size = tokenizer.n_vocab,
+        embed_dim = 192,
+        num_heads = 6,
+        feed_forward_dim = 512, 
+        num_transformer_blocks = 6,
+        rngs = nnx.Rngs(0)
+    )
+    
+    print(model)
