@@ -15,3 +15,5 @@ def loss(params, batch):
 
 gradient_function = jit(grad(loss))
 perexample_grads = jit(vmap(grad(loss), in_axes=(None, 0))) #, in_shardings = ..., out_shardings= ...)
+
+print(perexample_grads)
