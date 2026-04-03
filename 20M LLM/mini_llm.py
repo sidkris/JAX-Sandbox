@@ -83,7 +83,7 @@ if __name__ == "__main__":
     tokenizer = tiktoken.get_encoding("gpt2")
     
     model = MiniLLM(
-        max_len = 128,
+        maxlen = 128,
         vocab_size = tokenizer.n_vocab,
         embed_dim = 192,
         num_heads = 6,
