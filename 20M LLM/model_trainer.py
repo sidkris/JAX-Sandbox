@@ -90,7 +90,8 @@ for epoch in range(num_epochs):
         step += 1
 
 
-checkpoint_path = Path.cwd() / "small_checkpoint.orbax"
+# checkpoint_path = Path.cwd() / "small_checkpoint.orbax"
+checkpoint_path = (Path.cwd() / "small_checkpoint.orbax").resolve().as_posix()
 
 checkpointer = orbax.PyTreeCheckpointer()
 
