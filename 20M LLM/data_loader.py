@@ -48,3 +48,21 @@ class StoryDataset:
         
         tokens.extend([0] * (self.maxlen - len(tokens)))
         return tokens 
+    
+
+
+shuffled_sampler = grain.IndexSampler(
+    num_records = 10,
+    shuffle = True,
+    seed = 42,
+    shard_options = grain.NoSharding(),
+    num_epochs = 1
+)
+
+def print_sampler_example(sampler, name):
+    print(f"\n{name}")
+    for i, idx in enumerate(sampler):
+        print(f"Record {i} : {idx}")
+
+# print_sampler_example(shuffled_sampler, "Shuffled Sampler")
+
