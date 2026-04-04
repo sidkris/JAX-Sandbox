@@ -7,7 +7,7 @@ import optax
 from data_loader import load_data
 from mini_llm import MiniLLM 
 import orbax.checkpoint as orbax
-import Path
+from pathlib import Path
 
 maxlen = 128
 tokenizer = tiktoken.get_encoding("gpt2")
