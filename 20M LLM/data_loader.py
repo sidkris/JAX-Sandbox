@@ -89,3 +89,5 @@ dataloader, batches_per_epoch = create_dataloader(
 
 print("\nDataloader Created Successfully.")
 print(f"Will produce {batches_per_epoch} batches per epoch.\n")
+
+print(next(iter(dataloader)))
