@@ -42,7 +42,7 @@ lr_schedule = optax.warmup_cosine_decay_schedule(
     end_value = 1e-5
 )
 
-optimizer = nnx.Optimizer(
+optimizer = nnx.ModelAndOptimizer(
     model, 
     optax.adamw(learning_rate = lr_schedule, weight_decay = 0.01)
 )
@@ -57,7 +57,7 @@ def train_step(model, optimizer, metrics, batch):
     grad_fn = nnx.value_and_grad(loss_fn, has_aux = True)
     (loss, logits), grads = grad_fn(model, batch)
 
-    metrics.update(loss, logits, labels = batch[1])
+    metrics.update(loss = loss, logits = logits, labels = batch[1])
     optimizer.update(grads)
 
 
