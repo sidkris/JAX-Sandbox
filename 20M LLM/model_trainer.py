@@ -7,6 +7,7 @@ import optax
 from data_loader import load_data
 from mini_llm import MiniLLM 
 import orbax.checkpoint as orbax
+import Path
 
 maxlen = 128
 tokenizer = tiktoken.get_encoding("gpt2")
@@ -89,7 +90,7 @@ for epoch in range(num_epochs):
         step += 1
 
 
-checkpoint_path = r"20M LLM\model output\small_checkpoint.orbax"
+checkpoint_path = Path.cwd() / "small_checkpoint.orbax"
 
 checkpointer = orbax.PyTreeCheckpointer()
 
