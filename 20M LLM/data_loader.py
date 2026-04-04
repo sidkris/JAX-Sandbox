@@ -72,3 +72,20 @@ def create_dataloader(stories, tokenizer, maxlen, batch_size, shuffle = False, n
 
     return dataloader, estimated_batches
 
+
+
+stories = load_training_data()
+
+dataloader, batches_per_epoch = create_dataloader(
+    stories = stories, 
+    tokenizer = tiktoken.get_encoding("gpt2"),
+    maxlen = 128,
+    batch_size = 32,
+    shuffle = False,
+    num_epochs = 1,
+    seed = 21,
+    worker_count = 0    # Single Process
+)
+
+print("\nDataloader Created Successfully.")
+print(f"Will produce {batches_per_epoch} batches per epoch.\n")
