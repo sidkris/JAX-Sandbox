@@ -20,12 +20,6 @@ def load_training_data():
 
     return stories
 
-    # print("First story (300 chars):\n")
-    # story = stories[0]
-    # print(story.strip()[:300], "...")
-
-    # print(f"\nTotal number of stories: {len(stories)}")
-
 
 
 class StoryDataset:
@@ -51,18 +45,30 @@ class StoryDataset:
     
 
 
-shuffled_sampler = grain.IndexSampler(
-    num_records = 10,
-    shuffle = True,
-    seed = 42,
-    shard_options = grain.NoSharding(),
-    num_epochs = 1
-)
-
 def print_sampler_example(sampler, name):
     print(f"\n{name}")
     for i, idx in enumerate(sampler):
         print(f"Record {i} : {idx}")
 
-# print_sampler_example(shuffled_sampler, "Shuffled Sampler")
+
+def create_dataloader(stories, tokenizer, maxlen, batch_size, shuffle = False, num_epochs = 1, seed = 21, worker_count = 0):
+    dataset = StoryDataset(stories, maxlen, tokenizer)
+    estimated_batches = len(dataset) // batch_size
+
+    sampler = grain.IndexSampler(
+        num_records = len(dataset),
+        shuffle = shuffle,
+        seed = seed,
+        shard_options = grain.NoSharding(),
+        num_epochs = num_epochs
+    )
+
+    dataloader = grain.DataLoader(
+        data_source = dataset,
+        sampler = sampler,
+        operations = [grain.Batch(batch_size = batch_size, drop_remainder = True)], 
+        worker_count = worker_count
+    )
+
+    return dataloader, estimated_batches
 
