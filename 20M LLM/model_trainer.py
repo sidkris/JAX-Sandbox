@@ -93,7 +93,7 @@ for epoch in range(num_epochs):
 # checkpoint_path = Path.cwd() / "small_checkpoint.orbax"
 checkpoint_path = (Path.cwd() / "small_checkpoint.orbax").resolve().as_posix()
 
-checkpointer = orbax.PyTreeCheckpointer()
+checkpointer = orbax.PyTreeCheckpointer(use_ocdbt = False)
 
 checkpointer.save(checkpoint_path, nnx.state(model), force = True)
 print(f"Model Saved as {checkpoint_path}")
