@@ -102,6 +102,13 @@ def train():
     print(f"Model Saved as {checkpoint_path}")
 
 
+def load_checkpointed_model():
+
+    checkpoint_path = (Path.cwd() / "small_checkpoint.orbax").resolve().as_posix()
+
+    checkpointer = orbax.PyTreeCheckpointer(use_ocdbt = False)
+
+
     cpu_device = jax.devices("cpu")[0]
     cpu_sharding = SingleDeviceSharding(cpu_device)
 
@@ -118,4 +125,5 @@ def train():
 
     nnx.update(model, restored_state)
 
-train()
+    return restored_state
+
