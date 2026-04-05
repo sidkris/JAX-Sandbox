@@ -110,7 +110,7 @@ def train():
         nnx.state(model)
     )
 
-    print(f"\nRESTORE ARGS : {restore_args}")
+    print(f"\nMODEL STATE : {nnx.state(model)}")
 
 
 train()
