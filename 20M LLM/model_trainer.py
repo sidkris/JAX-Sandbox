@@ -8,6 +8,7 @@ from data_loader import load_data
 from mini_llm import MiniLLM 
 import orbax.checkpoint as orbax
 from pathlib import Path
+from jax.sharding import SingleDeviceSharding
 
 maxlen = 128
 tokenizer = tiktoken.get_encoding("gpt2")
@@ -63,37 +64,53 @@ def train_step(model, optimizer, metrics, batch):
     optimizer.update(grads)
 
 
-metrics_history = {"train_loss" : []}
+def train():
+
+    metrics_history = {"train_loss" : []}
 
 
-prep_target_batch = jax.vmap(
-    lambda tokens : jnp.concatenate((tokens[1:], jnp.array([0])))
-)
+    prep_target_batch = jax.vmap(
+        lambda tokens : jnp.concatenate((tokens[1:], jnp.array([0])))
+    )
 
 
-for epoch in range(num_epochs):
-    step = 0
-    for batch in text_dl:
-        input_batch = jnp.array(jnp.array(batch).T).astype(jnp.int32)
-        target_batch = prep_target_batch(jnp.array(jnp.array(batch).T)).astype(jnp.int32)
-        print(".", end = "")
-        train_step(model, optimizer, metrics, (input_batch, target_batch))
+    for epoch in range(num_epochs):
+        step = 0
+        for batch in text_dl:
+            input_batch = jnp.array(jnp.array(batch).T).astype(jnp.int32)
+            target_batch = prep_target_batch(jnp.array(jnp.array(batch).T)).astype(jnp.int32)
+            print(".", end = "")
+            train_step(model, optimizer, metrics, (input_batch, target_batch))
 
-        if (step + 1) % 2 == 0:
-            for metric, value in metrics.compute().items():
-                metrics_history[f"train_{metric}"].append(value)
-            
-            metrics.reset()
+            if (step + 1) % 2 == 0:
+                for metric, value in metrics.compute().items():
+                    metrics_history[f"train_{metric}"].append(value)
+                
+                metrics.reset()
 
-            current_lr = lr_schedule(step)
-            print(f"\EPOCH : {epoch + 1} | STEP : {step + 1} | LOSS : {metrics_history} | LR : {current_lr}\n")
-        step += 1
+                current_lr = lr_schedule(step)
+                print(f"\EPOCH : {epoch + 1} | STEP : {step + 1} | LOSS : {metrics_history} | LR : {current_lr}\n")
+            step += 1
 
 
-# checkpoint_path = Path.cwd() / "small_checkpoint.orbax"
-checkpoint_path = (Path.cwd() / "small_checkpoint.orbax").resolve().as_posix()
+    # checkpoint_path = Path.cwd() / "small_checkpoint.orbax"
+    checkpoint_path = (Path.cwd() / "small_checkpoint.orbax").resolve().as_posix()
 
-checkpointer = orbax.PyTreeCheckpointer(use_ocdbt = False)
+    checkpointer = orbax.PyTreeCheckpointer(use_ocdbt = False)
 
-checkpointer.save(checkpoint_path, nnx.state(model), force = True)
-print(f"Model Saved as {checkpoint_path}")
+    checkpointer.save(checkpoint_path, nnx.state(model), force = True)
+    print(f"Model Saved as {checkpoint_path}")
+
+
+    cpu_device = jax.devices("cpu")[0]
+    cpu_sharding = SingleDeviceSharding(cpu_device)
+
+    restore_args = jax.tree_util.tree_map(
+        lambda _: orbax.ArrayRestoreArgs(sharding = cpu_sharding),
+        nnx.state(model)
+    )
+
+    print(f"\nRESTORE ARGS : {restore_args}")
+
+
+train()
