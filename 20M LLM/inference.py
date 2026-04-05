@@ -68,4 +68,5 @@ if __name__ == "__main__":
     prompt = tokenizer.encode(prompt)
     prompt = np.array(prompt, dtype=np.int32)
     model_output = generate(model, prompt, max_new_tokens=100)
+    model_output = tokenizer.decode(model_output.tolist())
     print(model_output)
