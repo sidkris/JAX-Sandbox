@@ -110,7 +110,12 @@ def train():
         nnx.state(model)
     )
 
-    print(f"\nMODEL STATE : {nnx.state(model)}")
+    restored_state = checkpointer.restore(
+        checkpoint_path,
+        item = nnx.state(model),
+        restore_args = restore_args
+    )
 
+    nnx.update(model, restored_state)
 
 train()
